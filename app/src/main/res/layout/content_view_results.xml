@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.swyam.remoteimageprocessing.ViewResultsActivity"
+    tools:showIn="@layout/activity_view_results">
+
+    <ImageSwitcher
+        android:id="@+id/image_view_preview_result"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:adjustViewBounds="true"
+        android:scaleType="fitXY"/>
+
+    <ImageButton
+        android:id="@+id/btn_next_image"
+        android:src="@android:drawable/arrow_up_float"
+        android:rotation="90"
+        android:padding="15dp"
+        android:layout_marginRight="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/custom_button"
+        android:layout_gravity="center|end"/>
+
+    <ImageButton
+        android:id="@+id/btn_previous_image"
+        android:src="@android:drawable/arrow_up_float"
+        android:rotation="-90"
+        android:padding="15dp"
+        android:layout_marginLeft="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/custom_button"
+        android:layout_gravity="center|start"/>
+
+    <TextView
+        android:textSize="22sp"
+        android:padding="5sp"
+        android:id="@+id/tv_current_image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#77000000"
+        android:textColor="#ffffff"
+        android:textAlignment="center"
+        android:layout_gravity="top|center"/>
+
+    <TextView
+        android:id="@+id/tv_dates_algorithm_image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5sp"
+        android:background="#77000000"
+        android:textColor="#ffffff"
+        android:textAllCaps="true"
+        android:layout_gravity="bottom|center"/>
+
+</FrameLayout>

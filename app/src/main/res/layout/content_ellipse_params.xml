@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.swyam.remoteimageprocessing.EllipseParamsActivity"
+    tools:showIn="@layout/activity_ellipse_params">
+
+    <ImageView
+        android:id="@+id/image_view_capture"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        />
+
+    <Switch
+        android:id="@+id/switch_have_base"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/params_have_ellipse_base"
+        android:layout_gravity="top|right"
+        android:background="#55ffffff"
+        android:padding="5dp"
+        />
+
+    <LinearLayout
+        android:id="@+id/settings_image_ellipse"
+        android:padding="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:background="#55ffffff"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="2">
+
+            <TextView
+                android:id="@+id/text_view_rx"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/standard_radius_x"/>
+
+            <SeekBar
+                android:id="@+id/seekbar_rx"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                />
+
+            <Switch
+                android:id="@+id/switch_adjust_rx"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/params_cx2rx_on_touch"
+                />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="2">
+
+            <TextView
+                android:id="@+id/text_view_ry"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/standard_radius_y"/>
+
+            <SeekBar
+                android:id="@+id/seekbar_ry"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                />
+
+            <Switch
+                android:id="@+id/switch_adjust_ry"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/params_cy2ry_on_touch"
+
+                />
+        </LinearLayout>
+
+        <Switch
+            android:id="@+id/switch_circle"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="@string/params_circle"
+            />
+
+        <Button
+            android:id="@+id/btn_save_params"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/standard_save"/>
+
+
+    </LinearLayout>
+</FrameLayout>

@@ -1,0 +1,144 @@
+<resources>
+    <string name="app_name">Remote Image Processing</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_settings">Client-Server Settings</string>
+    <string name="title_activity_new_process">New Process</string>
+    <string name="title_activity_ellipse_params">Ellipse Params</string>
+    <string name="title_activity_send_data">Send Data</string>
+    <string name="title_activity_crop_square">Crop to Square</string>
+    <string name="title_activity_view_results">View Results</string>
+
+
+    <!-- standard strings -->
+    <string name="standard_file_not_found">File not found</string>
+    <string name="standard_error_action">Error on the action</string>
+    <string name="standard_save">Save</string>
+    <string name="standard_status">Status</string>
+    <string name="standard_settings_not_found">Settings not found</string>
+    <string name="standard_configure">Configure</string>
+    <string name="standard_camera_permission_granted">Camera Permissions Granted!</string>
+    <string name="standard_camera_permission_deny">Camera Permissions Deny!</string>
+    <string name="standard_delete_confirmation">Delete confirmation</string>
+    <string name="standard_delete_question">¿Are you sure to delete this capture?</string>
+    <string name="standard_yes">Yes</string>
+    <string name="standard_no">No</string>
+    <string name="standard_algorithm">Algorithm</string>
+    <string name="standard_saved_params">Saved Params</string>
+    <string name="standard_change">Change</string>
+    <string name="standard_threshold">Threshold</string>
+    <string name="standard_max_lines">Max Lines</string>
+    <string name="standard_radius_x">Radius X</string>
+    <string name="standard_radius_y">Radius Y</string>
+    <string name="standard_crop_x">Crop X</string>
+    <string name="standard_crop_y">Crop Y</string>
+    <string name="standard_th_name">Hough Transform</string>
+    <string name="standard_ce_name">Ellipse Counting</string>
+    <string name="standard_wait_moment">Wait a moment</string>
+    <string name="standard_process_finished">Finished Process</string>
+    <string name="standard_fail_add_media_store">Failed to add to mediastore system</string>
+
+    <!-- here go strings for  content_crop_square -->
+
+    <string name="crop_title_switch">Overwrite original capture</string>
+    <string name="crop_status_crop">Status</string>
+    <string name="crop_finalize_and_return">Finalize and return</string>
+    <string name="crop_cropping">Cropping Capture</string>
+    <string name="crop_on_edit_mode">On edition mode</string>
+    <string name="crop_square_captured">Square Capture created</string>
+
+    <!-- here go strings for content_ellipse_params -->
+    <string name="params_have_ellipse_base">I have an ellipse base</string>
+
+    <string name="params_cx2rx_on_touch">Cx2Rx on Touch</string>
+    <string name="params_cy2ry_on_touch">Cy2Ry on Touch</string>
+    <string name="params_circle">Circle</string>
+    <string name="params_enclose_base">You must enclose the independent ellipse in the second quadrant</string>
+
+
+    <string name="main_captures_found">Captures found</string>
+    <string name="main_capture">Capture</string>
+    <string name="main_imposible_read_capture_directory">Impossible read capture directory</string>
+    <string name="main_capture_deleted">Capture deleted</string>
+
+    <!-- here go strings for new_process -->
+
+    <string name="process_camera">Camera</string>
+    <string name="process_more_options_image">More options Image</string>
+    <string name="process_image_with_ellipse_base">Image with ellipse base</string>
+    <string name="process_send_image_to_server">Send Image to Server</string>
+    <string name="process_image_preview">Image Preview</string>
+    <string name="process_error_creating_image">Error creating output image file</string>
+    <string name="process_params_updated">Params updated</string>
+    <string name="process_invalid_values">Some invalid values. Not saved</string>
+    <string name="process_thres_maxlines">Thresh and MaxLines</string>
+    <string name="process_cropxy">CropXY</string>
+    <string name="process_radiusxy">RadiusXY</string>
+    <string name="process_with">With</string>
+    <string name="process_send_confirm">Send confirmation</string>
+    <string name="process_just_available_ce">Just available for Ellipse Counting Algorithm</string>
+    <string name="process_no_capture_selected">No capture selected</string>
+    <string name="process_selecte_one">Select One</string>
+    <string name="process_get_ellipse_params">Get Elipse Params</string>
+    <string name="process_crop_image_2_square">Crop image to be Square</string>
+    <string name="process_fail_thumb_creation">Fail thumbnail creation</string>
+
+
+    <!-- here go strings for send_data  -->
+    <string name="send_cant_read">CANT READ FILE</string>
+    <string name="send_server_timeout">SERVER CONNECTION TIMEOUT</string>
+
+    <string name="send_exception_output">OUTPUTSTREAM EXCEPTION</string>
+    <string name="send_fail_send">FAIL SENDING DATA</string>
+    <string name="send_process_activity">Progress activity..</string>
+    <string name="send_task_running">Some work is still runing</string>
+    <string name="send_file_received">File received</string>
+    <string name="send_file_saved">FILE SAVED CORRECTLY</string>
+    <string name="send_connecting_server">Connecting to Server</string>
+    <string name="send_sending_data">Sending data parameter</string>
+    <string name="send_data_sent">Data parameter sent</string>
+    <string name="send_sending_capture">Sending capture</string>
+    <string name="send_connection_closed">Connection closed</string>
+    <string name="send_data_sent_success">DATA SENT SUCCESSFULLY</string>
+    <string name="send_error_sending_data">ERROR WHILE SENDING DATA</string>
+    <string name="send_starting_listen">Starting to Listen</string>
+    <string name="send_port">port</string>
+    <string name="send_listening_in">Listening in</string>
+    <string name="send_file_output">File output</string>
+    <string name="send_receiving_image">Receiving Image Response</string>
+    <string name="send_image_received_success">IMAGE RECEIVED SUCCESSFULL</string>
+    <string name="send_error_receiving">ERROR WHILE WAITING FOR RESPONSE. PROCESS FINISHED</string>
+    <string name="sett_ip_address_server">IP Address Server</string>
+    <string name="sett_example_192_168_10_1">Example 192.168.10.1</string>
+    <string name="sett_port_server">Port Server</string>
+    <string name="sett_example_4403">Example 4403</string>
+    <string name="sett_my_port">My Port</string>
+    <string name="sett_example_3033">Example 3033</string>
+    <string name="sett_wait_answer_limit">Wait Answer Limit</string>
+    <string name="sett_seconds">Seconds</string>
+
+
+    <string name="view_share_via">Share via</string>
+    <string name="view_algorithm_not_executed">This algorithm has not been executed</string>
+    <string name="dialog_run_algorithm">Run Algorithm</string>
+    <string name="dialog_view">View</string>
+    <string name="dialog_close">Close</string>
+    <string name="prompt_param1">Param1</string>
+    <string name="prompt_param2">Param2</string>
+
+
+    <string name="menu_import">Import</string>
+    <string name="menu_results">My Results</string>
+    <string name="menu_settings">Settings</string>
+
+    <string name="rv_no_execute">No executed algorithm</string>
+    <string name="rv_executed_th">Executed in TH</string>
+    <string name="rv_executed_ce">Executed in CE</string>
+    <string name="rv_executed_both">Executed in TH and CE</string>
+    <string name="menu_title_app">Remote Image Processing</string>
+    <string name="android_studio_android_com">Send images for remote high performance processing</string>
+
+</resources>

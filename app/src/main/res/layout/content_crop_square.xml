@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.swyam.remoteimageprocessing.CropSquareActivity"
+    tools:showIn="@layout/activity_crop_square">
+
+    <ImageView
+        android:id="@+id/image_view_preview_result"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"/>
+
+    <Switch
+        android:id="@+id/switch_overwrite_original_capture"
+        android:layout_margin="5dp"
+        android:padding="10dp"
+        android:background="@drawable/shape"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:text="@string/crop_title_switch"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|start"
+        android:orientation="horizontal">
+
+        <SeekBar
+            android:background="#55ffffff"
+            android:id="@+id/seekbar_dim_square"
+            android:layout_margin="5dp"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+            android:progress="50"
+            />
+
+        <Button
+            android:id="@+id/btn_save_square_crop"
+            android:layout_margin="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/standard_save"
+            android:background="@drawable/shape"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linear_almost_finish"
+        android:layout_width="400dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#77ffffff"
+        android:padding="15dp"
+        android:layout_gravity="center">
+
+        <TextView
+            android:id="@+id/text_view_status_cropping"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:textSize="20sp"
+            android:maxLines="2"
+            android:text="@string/crop_status_crop"/>
+
+        <ProgressBar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="false"
+            android:max="100"
+            android:progress="0"
+            android:padding="5dp"
+            android:id="@+id/progressBar"
+            android:progressDrawable="@drawable/progressbarcolor"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:layout_gravity="center_horizontal" />
+
+        <Button
+            android:textColor="@color/color_icons"
+            android:id="@+id/btn_finish_cropping"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:text="@string/crop_finalize_and_return"/>
+
+    </LinearLayout>
+
+
+</FrameLayout>

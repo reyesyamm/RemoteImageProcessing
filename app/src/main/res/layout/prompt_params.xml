@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/prompt_layout_id"
+    android:padding="5dp"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/text_view_algorithm_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textAllCaps="true"
+        android:padding="3dp"
+        android:text="Algorithm Name"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/text_view_param1_caption"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textAlignment="textEnd"
+            android:textSize="18sp"
+            android:textColor="@color/cardview_dark_background"
+            android:textStyle="bold"
+            android:paddingRight="5dp"
+            android:text="@string/prompt_param1"/>
+
+        <EditText
+            android:id="@+id/edit_text_param1_value"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:textAlignment="center"
+            android:inputType="numberDecimal"
+            android:background="@drawable/shape"
+            android:textSize="25sp"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/text_view_param2_caption"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textAlignment="textEnd"
+            android:textSize="18sp"
+            android:textColor="@color/cardview_dark_background"
+            android:textStyle="bold"
+            android:paddingRight="5dp"
+            android:text="@string/prompt_param2"/>
+
+        <EditText
+            android:id="@+id/edit_text_param2_value"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:textAlignment="center"
+            android:inputType="numberDecimal"
+            android:background="@drawable/shape"
+            android:textSize="25sp"
+            />
+
+    </LinearLayout>
+
+</LinearLayout>

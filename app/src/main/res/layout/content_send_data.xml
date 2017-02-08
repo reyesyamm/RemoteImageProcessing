@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/framelayout1"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.swyam.remoteimageprocessing.SendDataActivity"
+    tools:showIn="@layout/activity_send_data">
+
+    <ImageView
+        android:id="@+id/image_view_preview_result"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerInside"/>
+
+    <LinearLayout
+        android:padding="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#55ffffff"
+        android:layout_gravity="top|center">
+
+        <TextView
+            android:id="@+id/text_view_filename"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:text="File name"/>
+
+        <TextView
+            android:id="@+id/text_view_params"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Params values"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/text_view_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:textSize="20sp"
+                android:text="Status Activity"/>
+
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linear_center"
+        android:padding="15dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#55ffffff"
+        android:layout_gravity="center">
+
+        <TextView
+            android:id="@+id/text_view_current_activity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Current Background Activity"
+            android:textSize="20sp"
+            android:textColor="@color/cardview_dark_background"
+            android:padding="10dp"
+            android:textAllCaps="true"
+            android:textAlignment="center"/>
+
+        <ProgressBar
+            android:layout_width="match_parent"
+            android:indeterminate="false"
+            android:max="100"
+            android:id="@+id/progressBar"
+            android:progress="0"
+            android:layout_height="35dp"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:progressDrawable="@drawable/progressbarcolor"
+            android:layout_gravity="center_horizontal" />
+
+    </LinearLayout>
+
+</FrameLayout>
