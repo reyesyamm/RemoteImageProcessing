@@ -6,13 +6,19 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Color;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Parcelable;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.IntentCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -34,6 +40,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.nio.channels.FileChannel;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -45,6 +54,7 @@ public class MainActivity extends AppCompatActivity
 
     public static final int MY_PERMISSIONS_CAMERA = 0;
     public static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1;
+    private static final int SELECT_PICTURE = 2;
     DrawerLayout drawer;
     LinearLayoutManager llm;
     Context context;
@@ -53,6 +63,8 @@ public class MainActivity extends AppCompatActivity
     FloatingActionButton fab;
     Button btn_new_capture;
     TextView tv_number_captures;
+    List<Capture> list = new ArrayList<>();
+    SimpleDateFormat dateFormat;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,6 +88,7 @@ public class MainActivity extends AppCompatActivity
         llm = new LinearLayoutManager(context);
         btn_new_capture = (Button) findViewById(R.id.btn_new_capture);
         tv_number_captures = (TextView) findViewById(R.id.text_view_number_captures);
+        dateFormat = new SimpleDateFormat("MMM dd,yyyy hh:mm a");
 
         // manager for recycler view
         rv.setLayoutManager(llm);
@@ -98,7 +111,7 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                import_from_gallery();
             }
         });
 
@@ -153,11 +166,12 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) {
-            showSnack("Will import from gallery",Snackbar.LENGTH_SHORT,Color.BLACK);
-        } else if (id == R.id.nav_gallery) {
-            showSnack("Will show al results runned",Snackbar.LENGTH_SHORT,Color.BLACK);
-        } else if (id == R.id.nav_manage) {
+            import_from_gallery();
+        }else if (id == R.id.nav_manage) {
             start_settings_activity();
+        }else if(id==R.id.nav_about){
+            Intent intent = new Intent(MainActivity.this, AboutActivity.class);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -165,12 +179,75 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    void import_from_gallery(){
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent,
+                "Select Picture"), SELECT_PICTURE);
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            if (requestCode == SELECT_PICTURE) {
+                Uri selectedImageUri = data.getData();
+                String selectedImagePath = getPath(selectedImageUri);
+                final String directory = getExternalFilesDir(Environment.DIRECTORY_PICTURES).getAbsolutePath();
+                try{
+                    File src = new File(selectedImagePath);
+                    String filename = "RIPIMP_"+src.getName();
+                    File dest = new File(directory, filename);
+                    FileChannel fsrc = new FileInputStream(src).getChannel();
+                    FileChannel fdst = new FileOutputStream(dest).getChannel();
+                    fdst.transferFrom(fsrc, 0, fsrc.size());
+                    fsrc.close();
+                    fdst.close();
+
+                    Capture ncap = new Capture(null,filename,dateFormat.format(dest.lastModified()),0);
+                    list.add(ncap);
+                    adapter.notifyItemInserted(list.size() - 1);
+
+                }catch (Exception ex){
+                    showSnack(getString(R.string.standard_error_action),Snackbar.LENGTH_LONG,Color.RED);
+                    ex.printStackTrace();
+                }
+            }
+        }
+
+    }
+
+    /**
+     * helper to retrieve the path of an image URI
+     */
+    public String getPath(Uri uri) {
+        // just some safety built in
+        if( uri == null ) {
+            // TODO perform some logging or show user feedback
+            return null;
+        }
+        // try to retrieve the image from the media store first
+        // this will only work for images selected from gallery
+        String[] projection = { MediaStore.Images.Media.DATA };
+        Cursor cursor = managedQuery(uri, projection, null, null, null);
+        if( cursor != null ){
+            int column_index = cursor
+                    .getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            String path = cursor.getString(column_index);
+            cursor.close();
+            return path;
+        }
+        // this is our fallback here
+        return uri.getPath();
+    }
+
     public void fill_recycler(File[] files){
         int number_captures=0;
+
         if(files.length>0) {
-            List<Capture> list = new ArrayList<>();
+
             //DateFormat dateFormat = android.text.format.DateFormat.getDateFormat(getApplicationContext());
-            SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd,yyyy hh:mm a");
+
             String file_name_tmp;
             String file_date_tmp;
             for (int i = 0; i < files.length; i++) {
@@ -182,21 +259,23 @@ public class MainActivity extends AppCompatActivity
                     list.add(new Capture(UtilsView.getThumbBitmap("THUMB" + file_name_tmp,context), file_name_tmp, file_date_tmp,exec_num));
                 }
             }
-            adapter = new RVAdapter(context,list);
-            rv.setAdapter(adapter);
 
-            adapter.setOnItemClickListener(new OnItemClickListener() {
-                @Override
-                public void onItemClick(Capture capture) {
-                    showPopUp(capture);
-                }
-
-                @Override
-                public void onLongItemClick(Capture capture, int position){
-                    showDialogConfirmDelete(capture.name_file,position);
-                }
-            });
         }
+
+        adapter = new RVAdapter(context,list);
+        rv.setAdapter(adapter);
+
+        adapter.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(Capture capture) {
+                showPopUp(capture);
+            }
+
+            @Override
+            public void onLongItemClick(Capture capture, int position){
+                showDialogConfirmDelete(capture.name_file,position);
+            }
+        });
 
         tv_number_captures.setText(number_captures+"");
     }
@@ -238,9 +317,9 @@ public class MainActivity extends AppCompatActivity
         switch (requestCode) {
             case MY_PERMISSIONS_CAMERA: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    showSnack(getString(R.string.standard_camera_permission_granted),Snackbar.LENGTH_LONG,Color.GREEN);
+                    showSnack(getString(R.string.standard_camera_permission_granted),Snackbar.LENGTH_LONG,UtilsView.GREEN_50);
                 } else {
-                    showSnack(getString(R.string.standard_camera_permission_deny),Snackbar.LENGTH_LONG,Color.GREEN);
+                    showSnack(getString(R.string.standard_camera_permission_deny),Snackbar.LENGTH_LONG,Color.RED);
                 }
                 return;
             }
@@ -268,7 +347,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void showPopUp(final Capture capture){
-        final Dialog dialog = new Dialog(this);
+        final Dialog dialog = new Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
         dialog.setContentView(R.layout.custom_dialog_rv);
         dialog.setTitle(capture.name_file);
 
@@ -324,7 +403,7 @@ public class MainActivity extends AppCompatActivity
                     public void onClick(DialogInterface dialog, int which) {
                         if(UtilsView.deleteCapture(capture_name,context)){
                             adapter.removeAt(position);
-                            showSnack(getString(R.string.main_capture_deleted),Snackbar.LENGTH_SHORT,Color.GREEN);
+                            showSnack(getString(R.string.main_capture_deleted),Snackbar.LENGTH_SHORT,UtilsView.GREEN_50);
                         }else{
                             showSnack(getString(R.string.standard_error_action),Snackbar.LENGTH_SHORT,Color.RED);
                         }

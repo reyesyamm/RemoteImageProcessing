@@ -56,9 +56,9 @@ public class ViewResultsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_view_results);
         //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         //setSupportActionBar(toolbar);
-        list_pref_file_algorithm[0] = getString(R.string.main_capture);
-        list_pref_file_algorithm[1] = getString(R.string.standard_th_name);
-        list_pref_file_algorithm[2] = getString(R.string.standard_ce_name);
+        list_algorithm[0] = getString(R.string.main_capture);
+        list_algorithm[1] = getString(R.string.standard_th_name);
+        list_algorithm[2] = getString(R.string.standard_ce_name);
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
         imageSwitcher = (ImageSwitcher) findViewById(R.id.image_view_preview_result);
@@ -73,7 +73,7 @@ public class ViewResultsActivity extends AppCompatActivity {
             @Override
             public View makeView() {
                 ImageView myView = new ImageView(getApplicationContext());
-                myView.setScaleType(ImageView.ScaleType.FIT_START);
+                myView.setScaleType(ImageView.ScaleType.FIT_CENTER);
                 myView.setLayoutParams(new
                         ImageSwitcher.LayoutParams(Toolbar.LayoutParams.MATCH_PARENT,
                         Toolbar.LayoutParams.MATCH_PARENT));

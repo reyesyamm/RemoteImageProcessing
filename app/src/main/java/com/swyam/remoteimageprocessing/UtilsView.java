@@ -40,6 +40,13 @@ public class UtilsView {
     public static final int THUMBNAIL_SIZE=480;
 
 
+
+    // some colors
+    public static int GREEN_50 = Color.rgb(0,128,0);
+
+
+
+
     public static Bitmap getThumbBitmap(String file_name_TEMP, Context context){
         String file_name = file_name_TEMP;
         Bitmap bm = null;
@@ -174,6 +181,18 @@ public class UtilsView {
             if(imgFilethumb.exists()){
                 imgFilethumb.delete();
             }
+
+            File imgFilethumb2 = new File(storageDir,"TH_"+str_filename);
+            if(imgFilethumb2.exists()){
+                imgFilethumb2.delete();
+            }
+
+            File imgFilethumb3 = new File(storageDir,"CE_"+str_filename);
+            if(imgFilethumb3.exists()){
+                imgFilethumb3.delete();
+            }
+
+
             return true;
         }
 

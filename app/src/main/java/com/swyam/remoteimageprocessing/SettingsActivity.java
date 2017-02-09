@@ -62,7 +62,7 @@ public class SettingsActivity extends AppCompatActivity {
                 int  str_limit = UtilsView.to_int(limit.getText().toString());
                 if(validIp(str_ip) && str_port>0 && str_myport>0 && str_limit>0){
                     UtilsView.saveSettings(str_ip,str_port,str_myport, str_limit,context);
-                    showSnack(getString(R.string.standard_saved_params),Snackbar.LENGTH_LONG,Color.GREEN);
+                    showSnack(getString(R.string.standard_saved_params),Snackbar.LENGTH_LONG,UtilsView.GREEN_50);
                 }else{
                     showSnack(getString(R.string.standard_error_action),Snackbar.LENGTH_LONG,Color.RED);
                 }

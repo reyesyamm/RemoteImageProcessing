@@ -116,4 +116,20 @@
     <string name="view_algorithm_not_executed">Este algoritmo no ha sido ejecutado</string>
     <string name="view_share_via">Compartir vía</string>
     <string name="standard_fail_add_media_store">Error al agregar el archivo a la galería del sistema</string>
+    <string name="send_error_rec_1">El puerto actual está en uso</string>
+    <string name="send_error_rec_2">El servidor no ha respondido</string>
+    <string name="send_error_rec_3">Acción cancelada por el usuario</string>
+    <string name="send_error_rec_4">Error al obtener el flujo de entrada</string>
+    <string name="send_error_rec_5">Error leyendo datos del servidor</string>
+    <string name="send_error_rec_6">Error en el lado del servidor</string>
+    <string name="send_remaining_time">Tiempo límite en: </string>
+    <string name="send_sending_capture_percent">Porcentaje enviado</string>
+    <string name="send_sending_parameters">Enviando parámetros del algoritmo</string>
+    <string name="send_try_connection_server">Intento</string>
+    <string name="send_try_time">vez</string>
+    <string name="standard_action_canceled">La acción ha sido cancelada</string>
+    <string name="standard_text_cancel">Cancelar</string>
+    <string name="standard_unknown_error">Error desconocido en la acción</string>
+    <string name="menu_about">Acerca de</string>
+    <string name="title_activity_about">Acerca de</string>
 </resources>

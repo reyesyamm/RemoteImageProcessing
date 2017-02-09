@@ -1,8 +1,11 @@
 package com.swyam.remoteimageprocessing;
 
+import android.annotation.TargetApi;
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -10,6 +13,7 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -18,6 +22,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -47,7 +52,6 @@ public class SendDataActivity extends AppCompatActivity {
 
     Context context;
     CoordinatorLayout coordinatorsd;
-    LinearLayout linear_center;
     String filename;
     int algorithm;
     int type_param;
@@ -57,18 +61,22 @@ public class SendDataActivity extends AppCompatActivity {
     boolean ready_and_configured =true;
 
     ImageView image_view_preview_result;
-    TextView text_view_filename,text_view_params, tv_status, tv_current_activity;
-    ProgressBar progressBar;
+    TextView text_view_filename,text_view_params;
 
     String server_ip;
     int server_port;
     int my_port;
-    int limit_wait_miliseconds;
+    int limit_wait_seconds;
     boolean work_done = false;
+    AsyncTaskSend send_task = null;
+    AsyncTaskReceive receive_task = null;
 
     int w,h;
 
-    String[] possible_fails_phase1 = new String[5];
+
+    ProgressDialog progressDialog;
+
+    String[] possible_fails_phase1 = new String[7];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,11 +87,19 @@ public class SendDataActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_send_data);
 
+        DisplayMetrics displaymetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+        h = displaymetrics.heightPixels;
+        w = displaymetrics.widthPixels;
+
+
         possible_fails_phase1[0] =getString(R.string.send_cant_read);
         possible_fails_phase1[1] =getString(R.string.send_server_timeout);
         possible_fails_phase1[2] =getString(R.string.standard_file_not_found);
         possible_fails_phase1[3] =getString(R.string.send_exception_output);
         possible_fails_phase1[4] =getString(R.string.send_fail_send);
+        possible_fails_phase1[5] = getString(R.string.standard_action_canceled);
+        possible_fails_phase1[6] = getString(R.string.standard_unknown_error);
 
         // receive data
         Intent intent = getIntent();
@@ -99,11 +115,40 @@ public class SendDataActivity extends AppCompatActivity {
         image_view_preview_result = (ImageView) findViewById(R.id.image_view_preview_result);
         text_view_filename = (TextView) findViewById(R.id.text_view_filename);
         text_view_params = (TextView) findViewById(R.id.text_view_params);
-        tv_status = (TextView) findViewById(R.id.text_view_status);
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        tv_current_activity = (TextView)findViewById(R.id.text_view_current_activity);
-        linear_center = (LinearLayout) findViewById(R.id.linear_center);
 
+
+
+
+        progressDialog = new ProgressDialog(this);
+
+        progressDialog.setProgressStyle(progressDialog.STYLE_HORIZONTAL);
+        progressDialog.setTitle("   ");
+        progressDialog.setMessage("  ");
+        progressDialog.setProgress(0);
+        progressDialog.setMax(100);
+        progressDialog.setProgressDrawable(getResources().getDrawable(R.drawable.progressbarcolor));
+        progressDialog.setCancelable(false);
+        progressDialog.setButton(DialogInterface.BUTTON_NEUTRAL,getString(R.string.standard_text_cancel),new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if(!work_done){
+                    try{
+                        send_task.cancel(true);
+                    }catch(Exception ex){
+
+                    }
+
+                    try{
+                        receive_task.cancel(true);
+                    }catch(Exception ex){
+
+                    }
+                    work_done=true;
+                }else{
+                    progressDialog.dismiss();
+                }
+            }
+        });
 
 
         // load text for each textview
@@ -112,44 +157,50 @@ public class SendDataActivity extends AppCompatActivity {
         String params ="";
         switch (type_param){
             case 1: // Hough Transform
-                params=getString(R.string.standard_th_name)+"\n"+getString(R.string.standard_threshold)+": "+param1+"\n"+getString(R.string.standard_max_lines)+": "+param2;
+                params=getString(R.string.standard_th_name)+", "+getString(R.string.standard_threshold)+": "+param1+", "+getString(R.string.standard_max_lines)+": "+param2;
                 break;
             case 2:
-                params =getString(R.string.standard_ce_name)+"\n"+getString(R.string.standard_radius_x)+": "+param1+"\n"+getString(R.string.standard_radius_y)+": "+param2;
+                params =getString(R.string.standard_ce_name)+", "+getString(R.string.standard_radius_x)+": "+param1+", "+getString(R.string.standard_radius_y)+": "+param2;
                 break;
             case 3:
-                params = getString(R.string.standard_ce_name)+"\n"+getString(R.string.standard_crop_x)+": "+param1+"\n"+getString(R.string.standard_crop_y)+": "+param2;
+                params = getString(R.string.standard_ce_name)+", "+getString(R.string.standard_crop_x)+": "+param1+", "+getString(R.string.standard_crop_y)+": "+param2;
                 break;
         }
 
         text_view_params.setText(params);
-        tv_status.setText(getString(R.string.send_process_activity));
-
-
 
         // getting settings client-server
         settings_app = UtilsView.getSettingsApp(context);
         server_ip = settings_app.getString(UtilsView.SP_IP_SERVER,"");
         server_port = settings_app.getInt(UtilsView.SP_PORT_SERVER,0);
         my_port = settings_app.getInt(UtilsView.SP_MY_PORT,0);
-        limit_wait_miliseconds = settings_app.getInt(UtilsView.SP_LIMIT,60);
-
-        // configure progressbar
-        progressBar.setMax(limit_wait_miliseconds); // we get limit time wait | predeterminated is 60 seconds
-        progressBar.setProgress(0);
+        limit_wait_seconds = settings_app.getInt(UtilsView.SP_LIMIT,60);
 
         // adjust to miliseconds the limit
-        limit_wait_miliseconds*=1000; // 60 seconds => 60000 miliseconds (what socket.setSoTimeout(..) wait)
 
 
-        if(server_ip.equals("") || server_port<=0 || my_port<=0){
-            ready_and_configured= false;
-            showSnack(getString(R.string.standard_settings_not_found),Snackbar.LENGTH_LONG,Color.RED);
-            tv_status.setText(getString(R.string.standard_error_action));
-        }else{
-            send_data_to_server();
+
+        if(!work_done){
+            //w = image_view_preview_result.getWidth();
+            //h = image_view_preview_result.getHeight();
+            String abs_filename = UtilsView.getAbsolutePathName(filename,context);
+            Bitmap bm_thumb = UtilsView.getScaledBitmap(abs_filename,w,h);
+            if(bm_thumb!=null){
+                image_view_preview_result.setImageBitmap(bm_thumb);
+            }else{
+                image_view_preview_result.setImageResource(R.drawable.ic_menu_gallery);
+            }
+
+
+            if(server_ip.equals("") || server_port<=0 || my_port<=0){
+                ready_and_configured= false;
+                showSnack(getString(R.string.standard_settings_not_found),Snackbar.LENGTH_LONG,Color.RED);
+            }else{
+                Log.i("sending","executing sending");
+                send_data_to_server();
+            }
         }
-        // handle click events on buttons
+
 
     }
 
@@ -164,28 +215,17 @@ public class SendDataActivity extends AppCompatActivity {
 
     @Override
     public void onWindowFocusChanged(boolean hasWindowFocus) {
-        super.onWindowFocusChanged(hasWindowFocus);
         // Load thumbnail for display while ...
-        w = image_view_preview_result.getWidth();
-        h = image_view_preview_result.getHeight();
-        String abs_filename = UtilsView.getAbsolutePathName(filename,context);
-        Bitmap bm_thumb = UtilsView.getScaledBitmap(abs_filename,w,h);
-        if(bm_thumb!=null){
-            image_view_preview_result.setImageBitmap(bm_thumb);
-        }else{
-            image_view_preview_result.setImageResource(R.drawable.ic_menu_gallery);
-        }
+        super.onWindowFocusChanged(hasWindowFocus);
+
     }
 
     public void onPostSendedData(){
-        //showSnack("The capture and dates have been sent!",Snackbar.LENGTH_LONG,Color.GREEN);
-        //work_done = true;
         String p1 = my_port+"";
         String folder = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES).getAbsolutePath();
-        String limit_miliseconds = limit_wait_miliseconds+"";
-
-        AsyncTaskReceive receive = new AsyncTaskReceive();
-        receive.execute(p1,folder,limit_miliseconds);
+        String limit_miliseconds = limit_wait_seconds+"";
+        receive_task = new AsyncTaskReceive();
+        receive_task.execute(p1,folder,limit_miliseconds);
 
     }
 
@@ -194,16 +234,13 @@ public class SendDataActivity extends AppCompatActivity {
         String current_path = UtilsView.getAbsolutePathName(filename_out,context);
         Bitmap bm_out = UtilsView.getScaledBitmap(current_path,w,h);
         if(bm_out!=null){
+
             image_view_preview_result.setImageBitmap(bm_out);
             Drawable drawable = image_view_preview_result.getDrawable();
             Rect bounds = drawable.getBounds();
-            linear_center.animate().translationY(bounds.height()-linear_center.getHeight());
 
-            tv_current_activity.setText(getString(R.string.send_file_received)+": '"+filename_out+"'");
-            progressBar.setProgress(100);
-            tv_status.setText(getString(R.string.standard_process_finished));
             text_view_params.setText("");
-            showSnack(getString(R.string.send_file_saved),Snackbar.LENGTH_LONG,Color.GREEN);
+            showSnack(getString(R.string.send_file_saved),Snackbar.LENGTH_LONG,UtilsView.GREEN_50);
 
             // Finally we add this returnment value to gallery scann
 
@@ -223,8 +260,13 @@ public class SendDataActivity extends AppCompatActivity {
                 Log.e("result","Cannot be added the result to mediastore");
             }
 
+            progressDialog.dismiss();
         }else{
-            showSnack(getString(R.string.standard_file_not_found).toUpperCase(),Snackbar.LENGTH_LONG,Color.RED);
+            progressDialog.setTitle(getString(R.string.standard_unknown_error));
+            progressDialog.setMessage(getString(R.string.standard_file_not_found));
+            progressDialog.setProgress(100);
+            progressDialog.setProgressDrawable(getResources().getDrawable(R.drawable.progressbarcolorred));
+
         }
         work_done=true;
     }
@@ -249,8 +291,8 @@ public class SendDataActivity extends AppCompatActivity {
     public void send_data_to_server(){
         Log.i("send_task","Trying to send");
         if(!work_done){
-            AsyncTaskSend send_task = new AsyncTaskSend();
-            String p1,p2,p3,p4,p5,p6,p7,p8,p9;
+            send_task = new AsyncTaskSend();
+            String p1,p2,p3,p4,p5,p6,p7,p8,p9,p10;
             p1 = filename;
             p2 = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES).getAbsolutePath();
             p3 = String.valueOf(type_param);
@@ -260,17 +302,23 @@ public class SendDataActivity extends AppCompatActivity {
             p7 = server_ip;
             p8 = String.valueOf(server_port);
             p9 = String.valueOf(my_port);
-            send_task.execute(p1,p2,p3,p4,p5,p6,p7,p8,p9);
+            p10 = limit_wait_seconds+"";
+            send_task.execute(p1,p2,p3,p4,p5,p6,p7,p8,p9,p10);
         }
 
     }
 
     private void onPostFailSendData(int response_status){
-        showSnack(possible_fails_phase1[response_status-2],Snackbar.LENGTH_LONG,Color.RED);
+        showSnack(possible_fails_phase1[response_status-1],Snackbar.LENGTH_LONG,Color.RED);
         work_done = true;
     }
 
     private class AsyncTaskSend extends AsyncTask<String, String, Integer>{
+
+        @Override
+        protected void onPreExecute() {
+            progressDialog.show();
+        }
 
         @Override
         protected Integer doInBackground(String... params) { // 1 -> OK SUCCESS
@@ -283,6 +331,7 @@ public class SendDataActivity extends AppCompatActivity {
             String server_ip = params[6];
             int server_port = Integer.parseInt(params[7]);
             int myport = Integer.parseInt(params[8]);
+            int limit_wait = Integer.parseInt(params[9]);
             int data_sent;
 
             File file = new File(folder_dir,filename);
@@ -293,22 +342,51 @@ public class SendDataActivity extends AppCompatActivity {
             long file_length = file.length();
 
             Socket socket=null;
-            try {
-                publishProgress(getString(R.string.send_connecting_server),"30");
-                //socket = new Socket(server_ip,server_port);
+
+            int limit_try =15;
+            publishProgress(getString(R.string.send_connecting_server),getString(R.string.send_try_connection_server)+" 0/"+limit_try,"0");
+            int current_try=0;
+            int percent;
+            boolean flag_connected = false;
+            while(!isCancelled() && limit_try>current_try && !flag_connected){
                 socket = new Socket();
-                socket.connect(new InetSocketAddress(server_ip,server_port),30000);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return 3; // 3 -> SERVER TIMEOUT CONECTION
+                try {
+                    socket.connect(new InetSocketAddress(server_ip,server_port),2000);
+                    flag_connected = true;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    current_try++;
+                    percent = (current_try*100/limit_try);
+                    publishProgress(getString(R.string.send_connecting_server),
+                            getString(R.string.send_try_connection_server)+" "+current_try+"/"+limit_try,
+                            percent+"");
+                }
             }
+
+
+            if(isCancelled()){
+                return 6; // action canceled
+            }else if(limit_try<=current_try){
+                return 2; // server timeout
+            }else if(socket==null){
+                return 7; //  unknown error
+            }
+
+            // if not, les continue
+
+            publishProgress(getString(R.string.send_sending_data),getString(R.string.send_sending_parameters),"0");
 
             InputStream in=null;
             try {
                 in = new FileInputStream(file); // the file that we will send
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
-                return 4; // FILE NOT FOUND
+                try {
+                    socket.close();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+                return 3; // FILE NOT FOUND
             }
 
             OutputStream out=null;
@@ -318,10 +396,11 @@ public class SendDataActivity extends AppCompatActivity {
                 e.printStackTrace();
                 try {
                     in.close();
+                    socket.close();
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
-                return 5; // OUTPUTSTREAM EXCEPTION
+                return 4; // OUTPUTSTREAM EXCEPTION
             }
 
 
@@ -329,7 +408,7 @@ public class SendDataActivity extends AppCompatActivity {
 
 
             try {
-                publishProgress(getString(R.string.send_sending_data),"50");
+                publishProgress(getString(R.string.send_data_sent), getString(R.string.send_data_sent),  "50");
                 dos.writeInt(filename.length()); // 0 -> length filename
                 dos.writeBytes(filename); // 1 -> filename
                 dos.writeInt(type_param); // 2 -> type_param
@@ -337,8 +416,9 @@ public class SendDataActivity extends AppCompatActivity {
                 dos.writeDouble(param1); // 4 -> param1
                 dos.writeDouble(param2); // 5 -> param2
                 dos.writeInt(myport);    // 6 -> myport
+                dos.writeInt(limit_wait); // 7 -> limit that the client will be listening for an answer
 
-                publishProgress(getString(R.string.send_data_sent),"100");
+                publishProgress(getString(R.string.send_data_sent), getString(R.string.send_data_sent),  "100");
 
 
                 byte[] buffer = new byte[8192]; // recomended
@@ -346,19 +426,24 @@ public class SendDataActivity extends AppCompatActivity {
                 int aum=0;
                 int count;
                 int progressv;
-                publishProgress(getString(R.string.send_sending_capture),"0");
-                while((count=in.read(buffer))>0){
+                publishProgress(getString(R.string.send_sending_capture),  getString(R.string.send_sending_capture_percent),   "0");
+                while((count=in.read(buffer))>0 && !isCancelled()){
                     out.write(buffer,0,count);
                     aum+=count;
                     progressv = (int) (100*aum/file_length);
-                    publishProgress(getString(R.string.send_sending_capture),progressv+"");
+                    publishProgress(getString(R.string.send_sending_capture),    getString(R.string.send_sending_capture_percent),   progressv+"");
                 }
-                publishProgress(getString(R.string.send_connection_closed),"100");
+                publishProgress(getString(R.string.send_data_sent_success),  getString(R.string.send_data_sent_success),  "100");
+                out.flush();
 
-                data_sent = 1;
+                if(isCancelled()){
+                    data_sent = 6;
+                }else{
+                    data_sent = 0;
+                }
             } catch (IOException e) {
                 e.printStackTrace();
-                data_sent= 6;  // FAIL SENDING DATA
+                data_sent= 5;  // FAIL SENDING DATA
             }
 
             try{
@@ -374,20 +459,22 @@ public class SendDataActivity extends AppCompatActivity {
 
         @Override
         protected void onProgressUpdate(String... progress){
-            tv_current_activity.setText(progress[0]);
-            progressBar.setProgress(Integer.parseInt(progress[1]));
+            String title = progress[0];
+            String description = progress[1];
+            int progress_percent = Integer.parseInt(progress[2]);
+            progressDialog.setTitle(title);
+            progressDialog.setMessage(description);
+            progressDialog.setProgress(progress_percent);
         }
 
         @Override
         protected  void onPostExecute(Integer response_status){
-            if(response_status==1){
+            if(response_status==0){
                 onPostSendedData();
-                tv_current_activity.setText(getString(R.string.send_data_sent_success));
-                progressBar.setProgress(100);
             }else{
+                progressDialog.dismiss();
                 onPostFailSendData(response_status);
-                tv_current_activity.setText(getString(R.string.send_error_sending_data));
-                progressBar.setProgressDrawable(getDrawable(R.drawable.progressbarcolorred));
+
             }
         }
     }
@@ -395,31 +482,114 @@ public class SendDataActivity extends AppCompatActivity {
     private class AsyncTaskReceive extends AsyncTask<String,String,String>{
 
         @Override
+        protected void onPreExecute() {
+            progressDialog.setTitle(getString(R.string.send_starting_listen));
+            progressDialog.setMessage(getString(R.string.send_listening_in)+" "+my_port);
+            progressDialog.setProgress(0);
+        }
+
+        @Override
         protected String doInBackground(String... params) {
 
             int myport = Integer.parseInt(params[0]);
             String folder_dir = params[1];
-            int limit_miliseconds = Integer.parseInt(params[2]);
-            String name_out_file=null;
+            int limit_seconds = Integer.parseInt(params[2]);
+
+            int try_listen = limit_seconds/1;
+            int current_listen_time=0;
+            boolean connected = false;
+            ServerSocket socket = null;
+            try{
+                socket = new ServerSocket(myport);
+                socket.setSoTimeout(1000);
+            }catch(Exception ex){
+                return "1"; // 1 -> current port is used for some other application
+            }
+
+            Socket socketS=null;
+            int progress_list = 0;
+            while(try_listen>current_listen_time && !isCancelled() && !connected){
+
+                try {
+                    socketS = socket.accept();
+                    connected = true;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    current_listen_time++;
+                    progress_list = current_listen_time*100/try_listen;
+                    publishProgress(getString(R.string.send_starting_listen),
+                            (getString(R.string.send_listening_in)+" "+myport+". "+
+                                    getString(R.string.send_remaining_time)
+                                    +" "+(limit_seconds- current_listen_time)+" "+getString(R.string.sett_seconds))
+                            ,progress_list+"");
+                }
+
+            }
+
+
+            if(try_listen<=current_listen_time){
+                try {
+                    socket.close();
+                }catch (Exception ex){
+
+                }
+                return "2"; // 2 -> nothing come from server
+            }else if(isCancelled()){
+                try {
+                    socket.close();
+                    socketS.close();
+                }catch (Exception ex){
+
+                }
+                return "3"; // action canceled by user
+            }
+
+            if(!connected){
+                return "2"; // same (nothing come...)
+            }
+
+            publishProgress(getString(R.string.send_receiving_image),
+                    getString(R.string.send_receiving_image),
+                    "0");
+            InputStream in = null;
+            DataInputStream dis = null;
+            OutputStream out = null;
+
             try {
-                publishProgress(getString(R.string.send_starting_listen),"0");
-                ServerSocket socket = new ServerSocket(myport);
-                socket.setSoTimeout(limit_miliseconds);
-                publishProgress(getString(R.string.send_listening_in)+" "+myport+" "+getString(R.string.send_port),"10");
-                Socket socketS = socket.accept();
-                InputStream in = socketS.getInputStream();
-                DataInputStream dis = new DataInputStream(in);
-                OutputStream out=null;
+                in = socketS.getInputStream();
+            } catch (IOException e) {
+                e.printStackTrace();
+                try {
+                    socketS.close();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+                try {
+                    socket.close();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+
+
+                return "4"; // error trying to get inputstream
+
+            }
+
+            dis = new DataInputStream(in);
+            String returnment_str="6"; // default 6 means that server doesnt do well his job but response to this client
+            try {
                 int status = dis.readInt();
                 if(status==1){
                     int length_namefile = dis.readInt();
                     byte[] byte_name_file = new byte[length_namefile];
                     dis.read(byte_name_file);
-                    name_out_file = new String(byte_name_file,"UTF-8");
+                    returnment_str = new String(byte_name_file,"UTF-8");
+                    File file_out = new File(folder_dir,returnment_str);
+                    publishProgress(getString(R.string.send_file_output)+": "+returnment_str+"",
+                            getString(R.string.send_receiving_image),
+                            "0");
 
-                    File file_out = new File(folder_dir,name_out_file);
 
-                    publishProgress(getString(R.string.send_file_output)+": '"+name_out_file+"'","20");
                     long file_length = dis.readLong();
                     byte[] buffer = new byte[8192];
                     int th = (int) (file_length/8192);
@@ -431,46 +601,96 @@ public class SendDataActivity extends AppCompatActivity {
                         out.write(buffer, 0, count);
                         aum+=count;
                         progressv = (int) (100*aum/file_length);
-                        publishProgress(getString(R.string.send_receiving_image),progressv+"");
+                        publishProgress(getString(R.string.send_file_output)+": "+returnment_str+"",
+                                getString(R.string.send_receiving_image),
+                                progressv+"");
                     }
+
+                    dis.close();
+                    in.close();
+                    if(out!=null)
+                        out.close();
+                    socketS.close();
+                    socket.close();
+
+                    returnment_str = "0"+returnment_str;
+
                 }
-
-                dis.close();
-                in.close();
-                if(out!=null)
-                    out.close();
-                socketS.close();
-
-
-
-                socket.close();
 
             } catch (IOException e) {
                 e.printStackTrace();
+                try {
+                    socketS.close();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+                try {
+                    socket.close();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+
+                try {
+                    in.close();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+
+                return "5"; // error reading data from server
             }
 
-
-            return name_out_file;
+            return returnment_str;
 
         }
 
         @Override
         protected void onProgressUpdate(String... progress){
-            tv_current_activity.setText(progress[0]);
-            progressBar.setProgress(Integer.parseInt(progress[1]));
+            String title = progress[0];
+            String description = progress[1];
+            int progress_percent = Integer.parseInt(progress[2]);
+            progressDialog.setTitle(title);
+            progressDialog.setMessage(description);
+            progressDialog.setProgress(progress_percent);
         }
 
         @Override
         protected  void onPostExecute(String filename){
-            if(filename!=null){
-                tv_current_activity.setText(getString(R.string.send_image_received_success));
-                final_step(filename);
+
+            int status = Integer.parseInt(filename.charAt(0)+"");
+            if(status==0){
+                Log.i("namefileout",filename.substring(1, filename.length()));
+                final_step(filename.substring(1, filename.length()));
+
             }else{
-                tv_current_activity.setText(getString(R.string.send_error_receiving));
-                progressBar.setProgressDrawable(getDrawable(R.drawable.progressbarcolorred));
+                String last_message_error="";
+                switch (status){
+                    case 1:
+                        last_message_error = getString(R.string.send_error_rec_1);
+                        break;
+                    case 2:
+                        last_message_error = getString(R.string.send_error_rec_2);
+                        break;
+                    case 3:
+                        last_message_error = getString(R.string.send_error_rec_3);
+                        break;
+                    case 4:
+                        last_message_error = getString(R.string.send_error_rec_4);
+                        break;
+                    case 5:
+                        last_message_error = getString(R.string.send_error_rec_5);
+                        break;
+                    case 6:
+                        last_message_error = getString(R.string.send_error_rec_6);
+                        break;
+                    default:
+                        last_message_error = getString(R.string.send_error_receiving);
+
+                }
+                progressDialog.setProgress(100);
+                progressDialog.setTitle(getString(R.string.send_error_receiving));
+                progressDialog.setMessage(last_message_error);
                 work_done=true;
             }
-            progressBar.setProgress(100);
         }
     }
 

@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.swyam.remoteimageprocessing.AboutActivity"
+    tools:showIn="@layout/activity_about">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="50dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:textSize="25sp"
+            android:textColor="#333"
+            android:text="@string/about_label_title_net"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:textAlignment="center"
+            android:textSize="22sp"
+            android:textColor="@color/cardview_dark_background"
+            android:text="@string/about_title_net"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="100dp"
+            android:layout_marginRight="100dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:background="@android:color/darker_gray"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:textSize="25sp"
+            android:textColor="#333"
+            android:text="@string/about_label_title_proj"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:textAlignment="center"
+            android:textSize="22sp"
+            android:textColor="@color/cardview_dark_background"
+            android:text="@string/about_title_proj"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="100dp"
+            android:layout_marginRight="100dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:background="@android:color/darker_gray"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:paddingTop="30dp"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            android:textColor="#333"
+            android:text="@string/about_label_academic_participants"/>
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="30dp"
+            android:textAlignment="center"
+            android:textSize="25sp"
+            android:textColor="#333"
+            android:text="Universidad Autónoma de Yucatán"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:textSize="20sp"
+            android:textColor="#333"
+            android:text="CA promep. Ciencias de la Computación Unidad Tizimín"/>
+        <TextView
+            android:textSize="20sp"
+            android:textColor="#0000FF"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="Clave: UADY-CA-92"/>
+
+
+
+
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="30dp"
+            android:textAlignment="center"
+            android:textSize="25sp"
+            android:textColor="#333"
+            android:text="Universidad del Caribe"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:textSize="20sp"
+            android:textColor="#333"
+            android:text="CA promep. Ciencias de la Computación y Comunicaciones"/>
+        <TextView
+            android:textSize="20sp"
+            android:textColor="#0000FF"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="Clave: UCARIBE-CA-10"/>
+
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="30dp"
+            android:textAlignment="center"
+            android:textSize="25sp"
+            android:textColor="#333"
+            android:text="Centro de Investigación Científica y de Educación Superior de Ensenada"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:textSize="20sp"
+            android:textColor="#333"
+            android:text="CA externo al promep. Grupo de Investigación en Ciencias de la Computación del CICESE"/>
+
+
+
+    </LinearLayout>
+</ScrollView>

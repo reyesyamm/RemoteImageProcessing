@@ -285,6 +285,17 @@ public class EllipseParamsActivity extends AppCompatActivity {
             }
         });
 
+        switch_adjust_rx.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                switch_circle.setChecked(false);
+            }
+        });
+
+        switch_adjust_ry.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                switch_circle.setChecked(false);
+            }
+        });
 
 
         switch_circle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -308,7 +319,6 @@ public class EllipseParamsActivity extends AppCompatActivity {
             }
         });
 
-
     }
 
     private void showSnack(String message, int duration, int color){
@@ -330,7 +340,7 @@ public class EllipseParamsActivity extends AppCompatActivity {
         paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setColor(Color.GREEN);
         paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(10);
+        paint.setStrokeWidth(5);
 
         paint2 = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint2.setColor(Color.RED);
@@ -353,7 +363,12 @@ public class EllipseParamsActivity extends AppCompatActivity {
                 tempCanvas.drawLine(0.0f,(float)cy,(float)(cx),(float)cy,paint2);
 
             }else{
-                RectF oval1 = new RectF((int)(cx-2*rx) ,(int)(cy-2*ry), (int)(cx+(rx*2)),(int)(cy+(ry*2)));
+                RectF oval1 = new RectF((int)(cx-rx) ,(int)(cy-ry), (int)(cx+rx),(int)(cy+ry));
+                Log.i("radios","rx: "+rx+", ry: "+ry);
+                Log.i("radios2","rx2: "+correct_coord_x((float)rx)+", ry2: "+correct_coord_y((float)ry));
+
+                Log.i("centros","cx: "+cx+", cy: "+cy);
+
                 tempCanvas.drawOval(oval1, paint);
             }
 
